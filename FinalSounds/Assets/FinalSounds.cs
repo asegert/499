@@ -11,21 +11,18 @@ public class FinalSounds: MonoBehaviour {
 	public Texture[]fontLetters;
 	
 	//For Word Storage
-	public Texture[]Words;
 	public Texture[]Words1;
-	public Texture[]Words2;
-	public Texture[]Words3;
-	public int[]WordsId;
 	public int prev;
 	
 	//Border Image
 	public Texture border;
 	//Arrays to hold Sounds for Words and Individual Letters
 	public AudioClip[]wordSounds;
-	public AudioClip[]wordSounds1;
-	public AudioClip[]wordSounds2;
-	public AudioClip[]wordSounds3;
 	public AudioClip[]letterSounds;
+	//Yay sounds
+	public AudioClip[]Yay;
+	//Nay sounds
+	public AudioClip[]Nay;
 	//Audio Source
 	public AudioSource playAud;
 	//Random Number to Choose Picture Cue
@@ -55,6 +52,8 @@ public class FinalSounds: MonoBehaviour {
 	public bool[]usable;
 	//Holds alphabet value (0-25)
 	public int indeX;
+	//Checks if congrat audio should be played 0=no, 1=yay sound, 2=nay sound
+	public int congrat;
 	//Keeps track of remaining rounds
 	public int rounds;
 	//keeps track of negative score points
@@ -73,28 +72,13 @@ public class FinalSounds: MonoBehaviour {
 		level = 1;
 		//Initializes Itchy Mode
 		itchyMode = true;
-		
+		//Initalize congrat
+		congrat = 0;
 		
 		//Initializes AudioSource
 		playAud=gameObject.AddComponent<AudioSource> ();
 		//Initializes ranDisplay in order to initialize prev in SetRandom();
 		ranDisplay = -1;
-		//sets array of pictures/sounds and rounds based on level
-		if (level == 2) {
-			rounds=15;
-			Words=Words2;
-			wordSounds=wordSounds2;
-		}
-		else if (level == 3) {
-			rounds=20;
-			Words=Words3;
-			wordSounds=wordSounds3;
-		}
-		else{
-			rounds=10;
-			Words=Words1;
-			wordSounds=wordSounds1;
-		}
 		//Sets ranDisplay
 		SetRandom ();
 	}
@@ -103,7 +87,7 @@ public class FinalSounds: MonoBehaviour {
 	void OnGUI()
 	{
 		//Holds new Word Texture
-		Texture temp = Words [ranDisplay];
+		Texture temp = Words1 [ranDisplay];
 		//Checks if a new Word is necessary, if so play the corresponding sound
 		if (newWord == 0) {
 			playSound(wordSounds [ranDisplay],0.8f, 1);
@@ -146,16 +130,9 @@ public class FinalSounds: MonoBehaviour {
 	void SetRandom()
 	{
 		prev = ranDisplay;
-		ranDisplay = Random.Range (0, 52);
+		ranDisplay = Random.Range (0, 72);
 		//index (0-25) of alphabet
-		indeX = ranDisplay % 2;
-		if (indeX == 0)
-			indeX = ranDisplay / 2;
-		else
-			indeX = (ranDisplay - 1) / 2;
-		
-		if (prev == indeX|!usable[indeX])
-			SetRandom ();
+		indeX = ranDisplay % 6;
 		
 		//Indicates a new Word is ready to be displayed
 		newWord = 0;
@@ -175,7 +152,7 @@ public class FinalSounds: MonoBehaviour {
 		int z=-1;
 		
 		while (i<3) {
-			j = Random.Range (0, 26);
+			j = Random.Range (0, 12);
 			//Checks that value is not the same as correct answer
 			if(j!=indeX)
 			{
@@ -263,12 +240,12 @@ public class FinalSounds: MonoBehaviour {
 			playAud.Stop ();
 		
 		if (letterOptions [buttonClicked - 1] == indeX) {
-			print ("true");
+			congrat=1;
 			respons = true;
 			rounds=rounds-1;
 			//if rounds=0 escape
 		} else {
-			print ("false");
+			congrat=2;
 			respons = false;
 			score=1;
 		}
@@ -301,9 +278,21 @@ public class FinalSounds: MonoBehaviour {
 		/*If the audio has stopped playing and letter is true
 		(a letter sound was played and the one chosen was correct) reset letter to false 
 		and set a new random word using SetRandom()*/
-		if (!playAud.isPlaying && letter == true) {
-			letter=false;
-			SetRandom ();
+		if(!playAud.isPlaying){
+			if(congrat==1){
+				congrat=Random.Range(0, 11);
+				playSound(Yay[congrat], 0.8f, 1);
+				congrat=0;
+			}
+			else if(congrat==2){
+				congrat=Random.Range(0, 6);
+				playSound(Nay[congrat], 0.8f, 1);
+				congrat=0;
+			}
+			else if (congrat==0 && respons == true) {
+				SetRandom ();
+				respons=false;
+			}
 		}
 	}
 }
