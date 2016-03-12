@@ -1,22 +1,25 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
-using UnityEngine.UI;
-using System.Collections.Generic;
 
-//[RequireComponent(typeof(AudioSource))]
-public class FinalSounds: MonoBehaviour {
+public class SoundRecon : MonoBehaviour {
 	
 	//Arrays to hold Picture and Letter Cues
 	public Texture[]pictureLetters;
 	public Texture[]fontLetters;
 	
 	//For Word Storage
-	public Texture[]Words1;
+	public Texture[]InitialWords;
+	public Texture[]FinalWords;
+	public Texture[]VowelWords;
+	public Texture[]Words;
 	public int prev;
 	
 	//Border Image
 	public Texture border;
 	//Arrays to hold Sounds for Words and Individual Letters
+	public AudioClip[]InitialSounds;
+	public AudioClip[]FinalSounds;
+	public AudioClip[]VowelSounds;
 	public AudioClip[]wordSounds;
 	public AudioClip[]letterSounds;
 	//Yay sounds
@@ -50,6 +53,9 @@ public class FinalSounds: MonoBehaviour {
 	public bool itchyMode;
 	//Array to store whether or not certain letters are being used
 	public bool[]usable;
+	public bool[]usableInitial;
+	public bool[]usableFinal;
+	public bool[]usableVowel;
 	//Holds alphabet value (0-25)
 	public int indeX;
 	//Checks if congrat audio should be played 0=no, 1=yay sound, 2=nay sound
@@ -62,12 +68,34 @@ public class FinalSounds: MonoBehaviour {
 	public Texture skip;
 	//Holds replay Icon Texture
 	public Texture replay;
+	//Stores Sound Type
+	public string SoundType;
 	
-	//Runs at Startup
-	void Start()
-	{
+	// Use this for initialization
+	void Start () {
+		//Chooses which sound type will be displayed
+		chooseSoundType ();
 		//Initializes usable letters
-		
+		/* usableInitial full 26 set gets added
+		 * usableFinal[0]=usable[1];
+		 * usableFinal[1]=usable[2];
+		 * usableFinal[2]=usable[3];
+		 * usableFinal[3]=usable[6];
+		 * usableFinal[4]=usable[7];
+		 * usableFinal[5]=usable[12];
+		 * usableFinal[6]=usable[13];
+		 * usableFinal[7]=usable[14];
+		 * usableFinal[8]=usable[18];
+		 * usableFinal[9]=usable[19];
+		 * usableFinal[10]=usable[20];
+		 * usableFinal[11]=usable[24];
+		 * usableVowel[0]=usable[0];
+		 * usableVowel[1]=usable[5];
+		 * usableVowel[2]=usable[9];
+		 * usableVowel[3]=usable[15];
+		 * usableVowel[4]=usable[21];
+		 */
+
 		//Initializes level
 		level = 1;
 		//Initializes Itchy Mode
@@ -87,7 +115,7 @@ public class FinalSounds: MonoBehaviour {
 	void OnGUI()
 	{
 		//Holds new Word Texture
-		Texture temp = Words1 [ranDisplay];
+		Texture temp = Words [ranDisplay];
 		//Checks if a new Word is necessary, if so play the corresponding sound
 		if (newWord == 0) {
 			playSound(wordSounds [ranDisplay],0.8f, 1);
@@ -125,18 +153,58 @@ public class FinalSounds: MonoBehaviour {
 		//Creates surrounding border
 		GUI.DrawTexture(new Rect(460, 150, 400, 400), border, ScaleMode.ScaleToFit, true, 1.0F);
 	}
-	
+
 	//Sets Random Location in Word List for the selected word
 	void SetRandom()
 	{
 		prev = ranDisplay;
-		ranDisplay = Random.Range (0, 72);
+		ranDisplay = Random.Range (0, Words.Length);
 		//index (0-25) of alphabet
-		indeX = ranDisplay % 6;
-		//Checks if valid
-		if (usable [indeX] == false) {
+		indeX = ranDisplay % (Words.Length/3);
+		
+		if (prev == indeX|!usable[indeX])
 			SetRandom ();
+
+		if (SoundType == "Final") {
+			if (indeX == 0) {
+				indeX = 1;
+			} else if (indeX == 1) {
+				indeX = 2;
+			} else if (indeX == 2) {
+				indeX = 3;
+			} else if (indeX == 3) {
+				indeX = 6;
+			} else if (indeX == 4) {
+				indeX = 7;
+			} else if (indeX == 5) {
+				indeX = 12;
+			} else if (indeX == 6) {
+				indeX = 13;
+			} else if (indeX == 7) {
+				indeX = 14;
+			} else if (indeX == 8) {
+				indeX = 18;
+			} else if (indeX == 9) {
+				indeX = 19;
+			} else if (indeX == 10) {
+				indeX = 20;
+			} else if (indeX == 11) {
+				indeX = 24;
+			}
 		}
+
+		if (SoundType == "Vowel") {
+			if (indeX == 1) {
+				indeX = 5;
+			} else if (indeX == 2) {
+				indeX = 9;
+			} else if (indeX == 3) {
+				indeX = 15;
+			} else if (indeX == 4) {
+				indeX = 21;
+			}
+		}
+
 		//Indicates a new Word is ready to be displayed
 		newWord = 0;
 		//Creates new Letter options for users to choose
@@ -155,7 +223,48 @@ public class FinalSounds: MonoBehaviour {
 		int z=-1;
 		
 		while (i<3) {
-			j = Random.Range (0, 12);
+			j = Random.Range (0, 26);
+
+			if (SoundType == "Final") {
+				if (j == 0) {
+					j = 1;
+				} else if (j == 1) {
+					j = 2;
+				} else if (j == 2) {
+					j = 3;
+				} else if (j == 3) {
+					j = 6;
+				} else if (j == 4) {
+					j = 7;
+				} else if (j == 5) {
+					j = 12;
+				} else if (j == 6) {
+					j = 13;
+				} else if (j == 7) {
+					j = 14;
+				} else if (j == 8) {
+					j = 18;
+				} else if (j == 9) {
+					j = 19;
+				} else if (j == 10) {
+					j = 20;
+				} else if (j == 11) {
+					j = 24;
+				}
+			}
+			
+			if (SoundType == "Vowel") {
+				if (j == 1) {
+					j = 5;
+				} else if (j == 2) {
+					j = 9;
+				} else if (j == 3) {
+					j = 15;
+				} else if (j == 4) {
+					j = 21;
+				}
+			}
+
 			//Checks that value is not the same as correct answer
 			if(j!=indeX)
 			{
@@ -203,7 +312,7 @@ public class FinalSounds: MonoBehaviour {
 		}
 		
 	}
-	
+
 	//Checks that the correct answer was selected
 	void checkCorrectness()
 	{
@@ -270,10 +379,9 @@ public class FinalSounds: MonoBehaviour {
 		if (version == 2&&respons==true)
 			letter = true;
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
-		
 		//If any of the letter buttons have been clicked (true) check the buttons correctness
 		if (b1 == true || b2 == true || b3 == true || b4 == true) {
 			checkCorrectness();
@@ -298,4 +406,26 @@ public class FinalSounds: MonoBehaviour {
 			}
 		}
 	}
+	
+	void chooseSoundType (){
+		int j = Random.Range (0, 12);
+		
+		if (j < 4) {
+			SoundType = "Initial";
+			Words=InitialWords;
+			wordSounds=InitialSounds;
+			usable=usableInitial;
+		} else if (j > 4 && j < 8) {
+			SoundType = "Final";
+			Words=FinalWords;
+			wordSounds=FinalSounds;
+			usable=usableFinal;
+		} else if (j > 8 && j < 12) {
+			SoundType = "Vowel";
+			Words=VowelWords;
+			wordSounds=VowelSounds;
+			usable=usableVowel;
+		}
+	}
 }
+

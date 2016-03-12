@@ -1,9 +1,9 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="..\Sound Recognition\Assets\Sound Recon.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Sound Recon.cs">
     <Files>
-      <File FileName="..\Sound Recognition\Assets\Sound Recon.cs" Line="5" Column="2" />
-      <File FileName="Assets\FinalSounds.cs" Line="136" Column="3" />
+      <File FileName="Assets\Sound Recon.cs" Line="5" Column="2" />
+      <File FileName="..\FinalSounds\Assets\FinalSounds.cs" Line="136" Column="3" />
       <File FileName="..\Initial Sounds\Assets\InitialSounds.cs" Line="1" Column="1" />
       <File FileName="..\Vowel Sounds\Assets\VowelSounds.cs" Line="77" Column="13" />
     </Files>
