@@ -34,10 +34,15 @@ public class Spelling : MonoBehaviour {
 	//Boolean values for the skip and replay buttons
 	public bool b1;
 	public bool b2;
+	public bool b3;
+	public bool Hinted;
 	//Checks if congrat audio should be played 0=no, 1=yay sound, 2=nay sound
 	public int congrat;
 	//Holds Skip Icon Texture
 	public Texture skip;
+	//Holds Hint Icon Texture
+	public Texture hint;
+	public Texture hints;
 	//Holds replay Icon Texture
 	public Texture replay;
 	//Keeps track of remaining rounds
@@ -62,7 +67,11 @@ public class Spelling : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		//Set level
-		level = 1;
+		level = 3;
+		//Sets hint texture
+		hints = hint;
+		//Sets boolean value to false
+		Hinted = false;
 		//Checks if a new Word is necessary, if so play the corresponding sound
 		if (newWord == 0) {
 			//playSound(wordSounds [ranDisplay],0.8f);
@@ -81,6 +90,8 @@ public class Spelling : MonoBehaviour {
 
 	void OnGUI() {
 		b1 = GUI.Button (new Rect (1200, 575, 150, 100), skip);
+		//Hint button
+		b3 = GUI.Button (new Rect (0, 0, 150, 100), hints);
 
 		if (level == 1) {
 			//Creates Word Image
@@ -92,7 +103,7 @@ public class Spelling : MonoBehaviour {
 			GUI.DrawTexture(new Rect(700, 300, 133, 133), let3);
 		}
 		else if (level == 2) {
-			if(three==1)
+			if(three==1||Hinted)
 			{
 				//Creates Word Image
 				b2 = GUI.Button(new Rect(450, 50, 400, 380), replay);
@@ -117,15 +128,15 @@ public class Spelling : MonoBehaviour {
 			b2 = GUI.Button(new Rect(450, 50, 400, 380), replay);
 			GUI.DrawTexture(new Rect(450, 50, 400, 250), Word[ranDisplay]);
 
-			if(one==1)
+			if(one==1||Hinted==true)
 			{
 				GUI.DrawTexture(new Rect(450, 300, 133, 133), let1);
 			}
-			if(two==1)
+			if(two==1||Hinted==true)
 			{
 				GUI.DrawTexture(new Rect(575, 300, 133, 133), let2);
 			}
-			if(three==1)
+			if(three==1||Hinted==true)
 			{
 				GUI.DrawTexture(new Rect(700, 300, 133, 133), let3);
 			}
@@ -265,6 +276,9 @@ public class Spelling : MonoBehaviour {
 	//Sets Random Location in Word Array for the selected word
 	void SetRandom()
 	{
+		//Reset hints
+		Hinted = false;
+		hints = hint;
 		//Sets first tier to false
 		one = 0;
 		//Sets second tier to false
@@ -310,9 +324,32 @@ public class Spelling : MonoBehaviour {
 		playAud.volume = vol;
 		playAud.Play();
 	}
+
+	void hinted()
+	{
+		if (level == 1) {
+			if(picKeyBoard==false)
+			{
+				let1 = fontLetters [Spell1 [ranDisplay]];
+				let2 = fontLetters [Spell2 [ranDisplay]];
+				let3 = fontLetters [Spell3 [ranDisplay]];
+			}
+			else{
+					let1 = pictureLetters [Spell1 [ranDisplay]];
+					let2 = pictureLetters [Spell2 [ranDisplay]];
+					let3 = pictureLetters [Spell3 [ranDisplay]];
+				}
+		}
+		hints = replay;
+		Hinted=true;
+		b3 = false;
+	}
 	
 	// Update is called once per frame
 	void Update () {
+		if (b3 == true) {
+			hinted();
+		}
 		//Skip function
 		if (b1 == true) {
 			b1 = false;
